@@ -1,0 +1,2875 @@
+/**
+ * A simple digital version of the classic pen-and-paper Hangman word game:
+ * a word or phrase to guess needs to be specified first, and then it can be
+ * guessed, letter by letter (ideally by someone other than the one who chose
+ * it). Best played in a terminal 24 rows high.
+ *
+ * The phrase to guess can be any sequence of ASCII characters. If it
+ * contains spaces, the spaces will be revealed to the guesser (there is no
+ * such special treatment for any other characters, however). Also note that
+ * lower-case and upper-case forms of the same letter are considered different
+ * (since they are two different ASCII characters).
+ *
+ * The guesser has 10 "lives" (it takes 10 wrong guesses to complete
+ * the hangman drawing). Guessing a character that has already been guessed
+ * before counts as a wrong guess.
+ *
+ * On victory, the guesser is rewarded with a happy smiley face. After a loss,
+ * a sad smiley face is printed, and the phrase that was to be guessed is
+ * revealed.
+ */
+
+
+/* priprava obesence */
+
+//+
+Ook. Ook.                       //priprava (CH1_h)
+//>>> +++++ +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.
+
+Ook! Ook?
+  //>> +
+  Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #5
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #8
+  //>> +++++ ++++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #10
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #13
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #16
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #19
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #22
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #26
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #28
+  //>>> +++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //50 do #31
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #35
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #38
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #40
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #43
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #47
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #49
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #53
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #56
+  //>> ++++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook.                     //40 do #58
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #61
+  //>>> ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook.                     //40 do #64
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #67
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #71
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #73
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #77
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #80
+  //>> +++++ ++++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #82
+  //> +
+  Ook. Ook?
+  Ook. Ook.                     //10 do #83
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #85
+  //> +
+  Ook. Ook?
+  Ook. Ook.                     //10 do #86
+  //>> +++++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //50 do #88
+  //> +
+  Ook. Ook?
+  Ook. Ook.                     //10 do #89
+  //>> +
+  Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #91
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #95
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #97
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #101
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #104
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #107
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #109
+  //> +
+  Ook. Ook?
+  Ook. Ook.                     //10 do #110
+  //>> +
+  Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #112
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #116
+  //>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #118
+  //>>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //10 do #122
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #125
+  //>> +++++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //50 do #127
+  //> +
+  Ook. Ook?
+  Ook. Ook.                     //10 do #128
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #131
+  //>> +++++ ++++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #133
+  //> +
+  Ook. Ook?
+  Ook. Ook.                     //10 do #134
+  //>> +
+  Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #136
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #139
+  //>>> +++++ +++++ ++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //120 do #142
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #145
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #148
+   //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #151
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #154
+  //>>> +++++ ++++
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //90 do #157
+  //>>> +
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //10 do #160
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< <<<<<
+  //<<<<< <<<<< <<<<< << -
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook.
+  Ook! Ook!
+Ook? Ook!
+
+//>> +
+Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #5
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #8
+//>> +++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #10
+//> +++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.   //3 do #11
+//>> +++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #13
+//> +++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.   //3 do #14
+//>> +++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #16
+//> +++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.   //3 do #17
+//>> +++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #19
+//> +++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.   //3 do #20
+//>>>>> > +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #26
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #28
+//> +
+Ook. Ook?
+Ook. Ook.                       //1 do #29
+//>> ---
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!   //47 do #31
+//> ++
+Ook. Ook?
+Ook. Ook. Ook. Ook.             //2 do #32
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #35
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #38
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #40
+//> ++++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //4 do #41
+//>>>>> > +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #47
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #49
+//> +
+Ook. Ook?
+Ook. Ook.                       //1 do #50
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #53
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #56
+//>>> +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //5 do #59
+//>> +++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #61
+//> +++++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //5 do #62
+//>> +
+Ook. Ook? Ook. Ook?
+Ook. Ook.                       //41 do #64
+//> +++++
+Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //5 do #65
+//>>>>> > +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #71
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #73
+//> +
+Ook. Ook?
+Ook. Ook.                       //1 do #74
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #77
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #80
+//>> ++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook.             //92 do #82
+//> ---
+Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!   //7 do #83
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #85
+//> ----
+Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook!                       //6 do #86
+//>> ---
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!   //47 do #88
+//> --
+Ook. Ook?
+Ook! Ook! Ook! Ook!             //8 do #89
+//>>>>> > +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #95
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #97
+//> +
+Ook. Ook?
+Ook. Ook.                       //1 do #98
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #101
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #104
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #107
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #109
+//> ----
+Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook!                       //6 do #110
+//>>>>> > +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #116
+//>> ++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #118
+//> +
+Ook. Ook?
+Ook. Ook.                       //1 do #119
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #122
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #125
+//>> ---
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!   //47 do #127
+//> -
+Ook. Ook?
+Ook! Ook!                       //9 do #128
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //11 do #131
+//>> ++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook.             //92 do #133
+//>>>>> > +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #139
+//>>> ++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //124 do #142
+//> +
+Ook. Ook?
+Ook. Ook.                       //1 do #143
+//>> +++++
+Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #145
+//>>> +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #148
+//>>> +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #151
+//>>> +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #154
+//>>> ++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.             //95 do #157
+//>>>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook?
+Ook. Ook.                       //priprava (CH2_h)
+
+/* priprava ASCII kodu pro vypis textu */
+
+//>>>>> > +++++ +++++
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.
+
+Ook! Ook?
+  //< +++++ +++++ +
+  Ook? Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //110 do #167
+  //< +++++ +++++
+  Ook? Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook.                     //100 do #166
+  //< +++++ ++
+  Ook? Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook.                     //70 do #165
+  //< +++
+  Ook? Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //30 do #164
+  //< +
+  Ook? Ook.
+  Ook. Ook.                     //10 do #163
+  //>>>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!
+Ook? Ook!
+
+/* vypis instruktazniho textu */
+
+//<<< - .
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook! Ook!
+Ook! Ook.                       //69  E
+//>> .
+Ook. Ook? Ook. Ook?
+Ook! Ook.                       //110 n
+//+++++ + .
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook! Ook.                       //116 t
+//< + .
+Ook? Ook.
+Ook. Ook.
+Ook! Ook.                       //101 e
+//> -- .
+Ook. Ook?
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //114 r
+//<<< ++ .
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook. Ook. Ook. Ook.
+Ook! Ook.                       //32
+//>> ---- .
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook!
+Ook! Ook.                       //97  a
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//>>> +++++ .
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.
+Ook! Ook.                       //119 w
+//----- --- .
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //111 o
+//+++ .
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook! Ook.                       //114 r
+//< +++ .
+Ook? Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook! Ook.                       //100 d
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//>>> --- .
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook.                       //111 o
+//+++ .
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook! Ook.                       //114 r
+//<<< .
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//>> --- .
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook.                       //97  a
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//>>> -- .
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //112 p
+//< +++++ ++ .
+Ook? Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.
+Ook! Ook.                       //104 h
+//> ++ .
+Ook. Ook?
+Ook. Ook. Ook. Ook.
+Ook! Ook.                       //114 r
+//< ----- -- .
+Ook? Ook.
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook!
+Ook! Ook.                       //97  a
+//> + .
+Ook. Ook?
+Ook. Ook.
+Ook! Ook.                       //115 s
+//< ++++ .
+Ook? Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.
+Ook! Ook.                       //101 e
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//>> ---- .
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook!
+Ook! Ook.                       //97  a
+//> ----- .
+Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //110 n
+//< +++ .
+Ook? Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook! Ook.                       //100 d
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//>>> ++ .
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook. Ook. Ook.
+Ook! Ook.                       //112 p
+//++ .
+Ook. Ook. Ook. Ook.
+Ook! Ook.                       //114 r
+//< + .
+Ook? Ook.
+Ook. Ook.
+Ook! Ook.                       //101 e
+//> + .
+Ook. Ook?
+Ook. Ook.
+Ook! Ook.                       //115 s
+//.
+Ook! Ook.                       //115 s
+//<<< .
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook! Ook.                       //32
+//> .
+Ook. Ook?
+Ook! Ook.                       //69  E
+//>> ----- .
+Ook. Ook? Ook. Ook?
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //110 n
+//+++++ + .
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook! Ook.                       //116 t
+//< .
+Ook? Ook.
+Ook! Ook.                       //101 e
+//> ---- .
+Ook. Ook?
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //114 r
+//<< ----- ----- - .
+Ook? Ook. Ook? Ook.
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook!
+Ook! Ook.                       //58  :
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //10 \n
+
+/* priprava konstant a promennych */
+
+//>>>>
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook?
+//[-] +++++ +++++
+Ook! Ook? Ook! Ook! Ook? Ook!
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //priprava (lives) - do zacatku 10 zivotu
+//< ----- -
+Ook? Ook.
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!   //priprava podtrzitka do #166
+//< ++++
+Ook? Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook.                       //priprava vetsitka do #165
+//>>>>> >> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook?
+Ook. Ook.                       //priprava (CH1_w)
+//>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //priprava (CH1_m)
+//>>>>> +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook?
+Ook. Ook.                       //priprava (CH2_m) v prvnim (i_m)
+
+/* nacteni slova */
+
+//<<<<< << ----- -----
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook.
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook! Ook! Ook! Ook! Ook!
+Ook! Ook!                       //presun na bunku za (CH1_w) - "-1. znak"
+
+Ook! Ook?                       //ctou se znaky a ukladaji se ob pet bunek
+  //+++++ +++++                 //dokud se nezada ASCII kod 10 = Enter
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook.
+  //>>>>>
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?           //presun na dalsi (char_w)
+  //,
+  Ook. Ook!                     //nacteni znaku
+  //----- -----
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook!
+Ook? Ook!
+
+//< +
+Ook? Ook.
+Ook. Ook.                       //vytvoreni (CH2_w) v indexu za poslednim znakem
+
+/* vykresleni (zakladu) obesence a (prazdneho) seznamu hadanych pismen */
+
+//<<<<< -
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook.
+Ook! Ook!                       //presun na posledni (i_w) a odecteni jednicky
+
+Ook! Ook?                       //presun na (CH1_w) - hleda se prvni jednicka
+  //+ <<<<< -                   //ob pet bunek
+  Ook. Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+  Ook! Ook!
+Ook? Ook!                       //Pozn.: vynulovany (CH1_w) se neobnovuje
+
+//<<<<< <<<< ..... .....
+//..... ..... ...
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook.             //23x odradkovani
+//>>> .
+Ook. Ook? Ook. Ook? Ook. Ook?   //vykresleni obesence (_ _____)
+Ook! Ook.                       //"_"
+//<< .
+Ook? Ook. Ook? Ook.
+Ook! Ook.                       //" "
+//>> .....
+Ook. Ook? Ook. Ook?
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook. Ook! Ook.             //"_____"
+//<<< ....
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook! Ook. Ook! Ook. Ook! Ook.
+Ook! Ook.                       //4x odradkovani
+
+/* pocatecni priprava a vykresleni slova */
+
+//>>>>> >>>>> >>>> -
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook?
+Ook! Ook!                       //presun na prvni (i_w) a odecteni jednicky
+
+Ook! Ook?                       //cyklus pripravuje a vypisuje zadane slovo.
+  //+                           //priprava spociva v oznaceni mezer za
+  Ook. Ook.                     //uhadnute - jinak by se i misto nich vypisovala
+  //> ----- ----- ----- -----   //jen podtrzitka
+  //----- ----- --
+  Ook. Ook?
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook! //presun na (char_w) a odecteni 32 - pokud tam
+  Ook! Ook! Ook! Ook!           //byla mezera (ASCII kod 32), nyni je tam nula
+  //> + <
+  Ook. Ook?
+  Ook. Ook.                     //nastaveni (guessed) na 1
+  Ook? Ook.
+
+  Ook! Ook?
+    //> -                       //pokud se tento cyklus spustil, znak nebyla
+    Ook. Ook?                   //mezera - (guessed) se tedy upravi opet na nulu
+    Ook! Ook!                   //a pointer tam i zustane - pro ukonceni cyklu
+  Ook? Ook!
+                                //timto manevrem se sjednoti pozice pointeru.
+  //<                           //presun o jednu bunku vlevo dostava pointer bud
+  Ook? Ook.                     //na nenulovy (char_w) pro (guessed) = 0 nebo na
+  //[<]                         //nulovy (i_w) pro guessed = 1. cyklus pak v
+  Ook! Ook? Ook? Ook. Ook? Ook! //prvnim pripade presune pointer na (i_w) nebo v
+                                //druhem pripade vubec neprobehne. tak ci tak,
+  //> +++++ +++++ +++++ +++++   //pointer konci na (i_w).
+  //+++++ +++++ ++
+  Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //obnoveni (char_w) prictenim driv odectenych 32
+  //>
+  Ook. Ook?
+
+  Ook! Ook?
+    //< .
+    Ook? Ook.                   //pokud se tento cyklus spustil, (guessed) = 1 a
+    Ook! Ook.                   //tedy se vypise (char_w) (kde je tedy mezera)
+    //>>>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?                   //presun na (char_m) pro ukonceni cyklu
+  Ook? Ook!
+
+  //<<
+  Ook? Ook. Ook? Ook.
+  //[<]
+  Ook! Ook? Ook? Ook. Ook? Ook! //sjednoceni pointeru na (i_w)
+
+  //>> -
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //timto odectenim se "obrati" role (guessed) -
+                                //pokud v nem predtim byla 0, ted tam neni a
+  Ook! Ook?                     //tedy se spusti tento cyklus, jehoz ukolem je
+    //<<<<< <<                  //vypsat podtrzitko
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.                   //presun na predchozi (i_w)
+
+    Ook! Ook?                   //presun na (CH1_w) - hleda se prvni nula ob pet
+      //<<<<<                   //bunek
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+    Ook? Ook!
+
+    //<<<<< < .
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook! Ook.                   //vypis podtrzitka
+    //>>>>> >>>>> >
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?                   //presun na prvni (i_w)
+
+    Ook! Ook?                   //presun na aktualni (i_w) - hleda se prvni nula
+      //>>>>>                   //ob pet bunek
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //>>>>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?         //presun na (char_m) pro ukonceni cyklu
+  Ook? Ook!
+
+  //<<
+  Ook? Ook. Ook? Ook.
+  //[<]
+  Ook! Ook? Ook? Ook. Ook? Ook! //sjednoceni pointeru na (i_w)
+  //>> +
+  Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //obnoveni (guessed)
+  //<<<<< <<
+  Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+  Ook? Ook.                     //presun na predchozi (i_w)
+
+  Ook! Ook?                     //presun na (CH1_w) - hleda se nula ob pet bunek
+    //<<<<<
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+  Ook? Ook!
+
+  //<<<<< <<< .
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+  Ook! Ook.                     //vypis mezery
+  //>>>>> >>>>> >>>
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?                     //presun na prvni (i_w)
+
+  Ook! Ook?                     //presun na aktualni (i_w) - hleda se prvni nula
+    //>>>>>                     //ob pet bunek
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //oznaceni aktualniho (i_w) za uz neaktualni
+  //>>>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na dalsi (i_w) a odecteni jednicky
+Ook? Ook!
+
+//+
+Ook. Ook.                       //obnoveni (CH2_w)
+//<<<<<
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook.             //presun na posledni (i_w)
+
+Ook! Ook?                       //presun na (CH1_w) s nulovanim indexovych bunek
+  //- <<<<<
+  Ook! Ook!
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+Ook? Ook!
+
+//<<<<< <<<< ..
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook! Ook. Ook! Ook.             //2x odradkovani
+//>>>>
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook?                       //presun na (lives)
+
+/* hlavni cyklus */
+
+Ook! Ook?
+
+  /* nacteni znaku a kontrola jeho vyskytu ve slove */
+
+  //<< .
+  Ook? Ook. Ook? Ook.
+  Ook! Ook.                     //vypis vetsitka
+  //>>> ,
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook!                     //nacteni znaku do (guess)
+  //> , ----- -----             //vsechny dalsi zadane znaky se nacitaji do
+  Ook. Ook?                     //(T1), dokud se nezada Enter. tyto znaky se
+  Ook. Ook!                     //neulozi.
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook! Ook! Ook! Ook! Ook!
+  Ook! Ook!
+
+  Ook! Ook?
+    //, ----- -----
+    Ook. Ook!
+    Ook! Ook! Ook! Ook!
+    Ook! Ook! Ook! Ook!
+    Ook! Ook! Ook! Ook!
+    Ook! Ook! Ook! Ook!
+    Ook! Ook! Ook! Ook!
+  Ook? Ook!
+
+  //>>>>> >>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na prvni (i_w) a odecteni jednicky
+
+  Ook! Ook?
+    //+
+    Ook. Ook.                   //obnoveni (i_w) prictenim odectene jednicky
+    //>> -
+    Ook. Ook? Ook. Ook?         //presun na (guessed) a odecteni jednicky.
+    Ook! Ook!                   //to funguje jako "obraceni role" - nasledujici
+                                //cyklus se spusti, pokud v (guessed) byla nula.
+    Ook! Ook?                   //tak se zabrani zbytecnemu porovnavani jiz
+      //<                       //uhadnutych pismen (stejne pismeno nemuze byt
+      Ook? Ook.                 //uhodnuto vickrat).
+
+      Ook! Ook?
+        //-                     //presunuti (char_w)
+        Ook! Ook!
+        //<<<<< <
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+
+        Ook! Ook?
+          //<<<<<
+          Ook? Ook. Ook? Ook.
+          Ook? Ook. Ook? Ook.
+          Ook? Ook.
+        Ook? Ook!
+
+        //<<< +
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook. Ook.               //do (T1)
+        //> +
+        Ook. Ook?
+        Ook. Ook.               //a do (T2) pro obnovu
+        //>>>>> >>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+
+        Ook! Ook?
+          //>>>>>
+          Ook. Ook? Ook. Ook?
+          Ook. Ook? Ook. Ook?
+          Ook. Ook?
+        Ook? Ook!
+
+        //>
+        Ook. Ook?
+      Ook? Ook!
+                                //obnova (char_w) z (T2)
+      //<<<<< <
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<<
+      Ook? Ook. Ook? Ook.
+
+      Ook! Ook?
+        //-
+        Ook! Ook!
+        //>>>>> >>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+
+        Ook! Ook?
+          //>>>>>
+          Ook. Ook? Ook. Ook?
+          Ook. Ook? Ook. Ook?
+          Ook. Ook?
+        Ook? Ook!
+
+        //> +
+        Ook. Ook?
+        Ook. Ook.
+        //<<<<< <
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+
+        Ook! Ook?
+          //<<<<<
+          Ook? Ook. Ook? Ook.
+          Ook? Ook. Ook? Ook.
+          Ook? Ook.
+        Ook? Ook!
+
+        //<<
+        Ook? Ook. Ook? Ook.
+      Ook? Ook!
+
+      //<<
+      Ook? Ook. Ook? Ook.
+
+      Ook! Ook?
+        //-                     //odecteni (guess)
+        Ook! Ook!
+        //> -
+        Ook. Ook?
+        Ook! Ook!               //od (T1)
+        //> +
+        Ook. Ook?
+        Ook. Ook.               //a presunuti do (T2) pro obnovu
+        //<<
+        Ook? Ook. Ook? Ook.
+      Ook? Ook!
+                                //obnova (guess) z (T2)
+      //>>
+      Ook. Ook? Ook. Ook?
+
+      Ook! Ook?
+        //-
+        Ook! Ook!
+        //<< +
+        Ook? Ook. Ook? Ook.
+        Ook. Ook.
+        //>>
+        Ook. Ook? Ook. Ook?
+      Ook? Ook!
+
+      //+
+      Ook. Ook.                 //zapis jednicky do (T2) - rozhodovaci bunka
+      //<
+      Ook? Ook.                 //presun na (T1), kde je (char_w) - (guess).
+                                //pokud je tam nula, (char_w) = (guess), cyklus
+      Ook! Ook?                 //se nespusti a v (T2) zustane jednicka. pokud
+        //> -                   //(char_w) != (guess), cyklus se spusti, (T2)
+        Ook. Ook?               //vynuluje a stejne tak i (T1).
+        Ook! Ook!
+        //+++++ +++++ +++++ +   //pred vynulovanim se k (T1) pricte 256 kvuli
+        Ook. Ook. Ook. Ook.     //kompatibilite s non-wrapping interprety
+        Ook. Ook. Ook. Ook.
+        Ook. Ook. Ook. Ook.
+        Ook. Ook. Ook. Ook.
+        Ook. Ook. Ook. Ook.
+        Ook. Ook. Ook. Ook.
+        Ook. Ook. Ook. Ook.
+        Ook. Ook. Ook. Ook.
+
+        Ook! Ook?
+          //-
+          Ook! Ook!
+          //< +++++ +++++ +++++ +
+          Ook? Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          Ook. Ook. Ook. Ook.
+          //>
+          Ook. Ook?
+        Ook? Ook!
+
+        //<
+        Ook? Ook.
+        //[-]
+        Ook! Ook?
+          Ook! Ook!
+        Ook? Ook!
+      Ook? Ook!
+
+      //>
+      Ook. Ook?                 //presun na (T2)
+
+      Ook! Ook?                 //cyklus se spusti, pokud se hadajici trefil -
+        //>>>>> > +             //provede tedy odpovidajici upravy
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook.               //presun na (hit) a pricteni jednicky
+        //>
+        Ook. Ook?
+
+        Ook! Ook?               //presun na aktualni (i_w)
+          //>>>>>
+          Ook. Ook? Ook. Ook?
+          Ook. Ook? Ook. Ook?
+          Ook. Ook?
+        Ook? Ook!
+
+        //>> +
+        Ook. Ook? Ook. Ook?
+        Ook. Ook.               //presun na (guessed) a pricteni jednicky
+        //<<<<< <<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+
+        Ook! Ook?               //presun na (CH1_w)
+          //<<<<<
+          Ook? Ook. Ook? Ook.
+          Ook? Ook. Ook? Ook.
+          Ook? Ook.
+        Ook? Ook!
+
+        //<< -
+        Ook? Ook. Ook? Ook.
+        Ook! Ook!               //presun na zpet na (T2) a vynulovani
+      Ook? Ook!
+
+      //>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?                 //presun na (T5) pro ukonceni cyklu
+    Ook? Ook!
+
+    //<<<<< <<
+    Ook? Ook. Ook? Ook.         //slozitejsi sjednocovaci manevr.
+    Ook? Ook. Ook? Ook.         //po predchozim cyklu je pointer bud na
+    Ook? Ook. Ook? Ook.         //(guessed) (cyklus neprobehl) nebo na (T5).
+    Ook? Ook.                   //presunem o sedm bunek vlevo se dostava na
+                                //predchozi (i_w)/#166. nasledujicim cyklem
+    Ook! Ook?                   //(hleda se nula ob pet bunek) se presune na
+      //<<<<<                   //(CH1_w)/#161. posun o jednu bunku vpravo ho
+      Ook? Ook. Ook? Ook.       //dostane na (T5)/(CH2_h). dalsi cyklus, hledani
+      Ook? Ook. Ook? Ook.       //nejblizsi nuly smerem vpravo, ho posune na
+      Ook? Ook.                 //(T5)/(T1). nasleduje presun o pet bunek vlevo,
+    Ook? Ook!                   //pak je na (guess)/#164. a konecne nasledujici
+                                //cyklus sjednoti jeho pozici na (T1).
+    //>
+    Ook. Ook?
+    //[>]
+    Ook! Ook?
+      Ook. Ook?
+    Ook? Ook!
+    //<<<<<
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    //[>]
+    Ook! Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //>>>>> >>>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+
+    Ook! Ook?                   //presun na aktualni (i_w)
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //+
+    Ook. Ook.                   //oznaceni aktualniho (i_w) za uz neaktualni
+    //>> +
+    Ook. Ook? Ook. Ook?
+    Ook. Ook.                   //obnoveni (guessed)
+    //>>> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!                   //presun na dalsi (i_w) a odecteni jednicky
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnoveni (CH2_w)
+  //<<<<<
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.           //presun na posledni (i_w)
+
+  Ook! Ook?                     //presun na (CH1_w) s nulovanim indexovych bunek
+    //- <<<<<
+    Ook! Ook!
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+  Ook? Ook!
+
+  /* uprava seznamu neuspesne tipovanych pismen */
+
+  //>> +
+  Ook. Ook? Ook. Ook?
+  Ook. Ook.                     //(T6) bude slouzit jako "opak" (hit)
+  //>>
+  Ook. Ook? Ook. Ook?
+
+  Ook! Ook?                     //pokud se tento cyklus spustil, (hit) != 0.
+    //<< -
+    Ook? Ook. Ook? Ook.
+    Ook! Ook!                   //proto se (T6) upravi na nulu
+    //>> [-]
+    Ook. Ook? Ook. Ook?
+    Ook! Ook?
+      Ook! Ook!
+    Ook? Ook!                   //a (hit) vynuluje.
+  Ook? Ook!
+
+  //<<
+  Ook? Ook. Ook? Ook.           //presun na (T6), ve kterem je nyni jednicka,
+                                //pokud v (hit) byla 0, nebo nula, pokud tam
+  Ook! Ook?                     //bylo neco jineho. tento cyklus se tedy spusti,
+    //<<<<< <                   //pokud hadane pismeno nebylo zasah.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+
+    Ook! Ook?                   //presunuti (guess) do dalsiho (char_m)
+      //-
+      Ook! Ook!
+      //>>>>> >>>>> >> -
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook! Ook!
+
+      Ook! Ook?                 //presun na (CH2_m) - hleda se jednicka ob pet
+        //+ >>>>> -             //bunek
+        Ook. Ook.
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.                 //obnova (CH2_m)
+      //> +
+      Ook. Ook?
+      Ook. Ook.
+      //<<<<< < -
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook! Ook!
+
+      Ook! Ook?                 //presun na (CH1_m)
+        //+ <<<<< -
+        Ook. Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.                 //obnova (CH1_m)
+      //<<<<< <<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.                 //presun zpet na (guess)
+    Ook? Ook!
+
+    //>>>>> >>>>> >> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook! Ook!
+
+    Ook! Ook?                   //presun na (CH2_m)
+      //+ >>>>> -
+      Ook. Ook.
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+      Ook! Ook!
+    Ook? Ook!
+
+    //>>>>> +
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook. Ook.                   //posun (CH2_m) do dalsiho indexu
+    //<<<<< -
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook! Ook!
+
+    Ook! Ook?                   //presun na (CH1_m)
+      //+ <<<<< -
+      Ook. Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+      Ook! Ook!
+    Ook? Ook!
+
+    //+
+    Ook. Ook.                   //obnova (CH1_m)
+    //<<<<< <<< -
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook! Ook!                   //ubrani zivota
+    //>>>>> >> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!                   //presun na (T6) a vynulovani
+  Ook? Ook!
+
+  //<<<<< <
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  //[-]
+  Ook! Ook? Ook! Ook! Ook? Ook! //vynulovani (guess)
+
+  /* vykresleni obesence */
+
+  //<<<<< ..... .....
+  //..... ..
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+  Ook! Ook. Ook! Ook. Ook! Ook.
+  Ook! Ook. Ook! Ook. Ook! Ook.
+  Ook! Ook. Ook! Ook. Ook! Ook.
+  Ook! Ook. Ook! Ook. Ook! Ook.
+  Ook! Ook. Ook! Ook. Ook! Ook.
+  Ook! Ook. Ook! Ook.           //17x odradkovani
+
+  //<<<< -
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook.
+  Ook! Ook!                     //presun na posledni (i_h) a odecteni jednicky
+
+  Ook! Ook?                     //presun na (CH1_h) - hleda se jednicka ob tri
+    //+ <<< -                   //bunky
+    Ook. Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook! Ook!
+  Ook? Ook!                     //Pozn.: vynulovany (CH1_h) se neobnovuje
+
+  //>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na prvni (i_h) a odecteni jednicky
+
+  Ook! Ook?
+    //++
+    Ook. Ook. Ook. Ook.         //oznaceni aktualniho (i_h)
+    //>
+    Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!                 //presunuti (char_h)
+      //>> -
+      Ook. Ook? Ook. Ook?
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ >>> -
+        Ook. Ook.
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>>>>> >>>>> > +
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+      Ook. Ook.                 //do (T5)
+      //<<<< +
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook. Ook.                 //a do (T1) pro obnovu
+      //<<<<< <<<<< -
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ <<< -
+        Ook. Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>
+      Ook. Ook?
+    Ook? Ook!
+                                //obnova (char_h) z (T1)
+    //>> -
+    Ook. Ook? Ook. Ook?
+    Ook! Ook!
+
+    Ook! Ook?
+      //+ >>> -
+      Ook. Ook.
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+      Ook! Ook!
+    Ook? Ook!
+
+    //+
+    Ook. Ook.
+    //>>>>> >>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!
+      //<<<<< <<<<< -
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ <<< -
+        Ook. Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //> +
+      Ook. Ook?
+      Ook. Ook.
+      //>> -
+      Ook. Ook? Ook. Ook?
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ >>> -
+        Ook. Ook.
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>>>>> >>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //<<<<< <<<<< -
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook! Ook!
+
+    Ook! Ook?
+      //+ <<< -
+      Ook. Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+      Ook! Ook!
+    Ook? Ook!
+
+    //+
+    Ook. Ook.
+    //>>
+    Ook. Ook? Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!                 //presunuti (display_wave)
+      //> -
+      Ook. Ook?
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ >>> -
+        Ook. Ook.
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>>>>> >>> +
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook.                 //do (T2)
+      //< +
+      Ook? Ook.
+      Ook. Ook.                 //a do (T1) pro obnovu
+      //<<<<< <<<<< -
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ <<< -
+        Ook. Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>>
+      Ook. Ook? Ook. Ook?
+    Ook? Ook!
+                                //obnova (display_wave) z (T1)
+    //> -
+    Ook. Ook?
+    Ook! Ook!
+
+    Ook! Ook?
+      //+ >>> -
+      Ook. Ook.
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+      Ook! Ook!
+    Ook? Ook!
+
+    //+
+    Ook. Ook.
+    //>>>>> >>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!
+      //<<<<< <<<<< -
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ <<< -
+        Ook. Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>> +
+      Ook. Ook? Ook. Ook?
+      Ook. Ook.
+      //> -
+      Ook. Ook?
+      Ook! Ook!
+
+      Ook! Ook?
+        //+ >>> -
+        Ook. Ook.
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+        Ook! Ook!
+      Ook? Ook!
+
+      //+
+      Ook. Ook.
+      //>>>>> >>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+                                //ulozeni hodnoty 10 - (lives) do (T1)
+    //+++++ +++++
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+    //<<
+    Ook? Ook. Ook? Ook.
+
+    Ook! Ook?
+      //-
+      Ook! Ook!
+      //> +
+      Ook. Ook?
+      Ook. Ook.
+      //> -
+      Ook. Ook?
+      Ook! Ook!
+      //<<
+      Ook? Ook. Ook? Ook.
+    Ook? Ook!
+                                //obnova (lives) z (T0)
+    //>
+    Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!
+      //< +
+      Ook? Ook.
+      Ook. Ook.
+      //>
+      Ook. Ook?
+    Ook? Ook!
+
+    //>>> ++++
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+
+    Ook! Ook?                   //zapsani 32 (ASCII kod mezery) do (T0)
+      //-
+      Ook! Ook!
+      //<<< +++++ +++
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+      Ook. Ook. Ook. Ook.
+      Ook. Ook. Ook. Ook.
+      Ook. Ook. Ook. Ook.
+      Ook. Ook. Ook. Ook.
+      //>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+    //+
+    Ook. Ook.                   //priprava zachytneho bodu do (T3)
+    //<
+    Ook? Ook.
+                                //dost nechutny porovnavaci algoritmus. na
+    Ook! Ook?                   //nejvysi urovni: nejprve se overi, jestli
+      //> -                     //(T2) neni 0 a pak se opakovane odecita z (T1)
+      Ook. Ook?                 //a (T2) a zjistuje se, co klesne na nulu driv.
+      Ook! Ook!                 //pokud (T1), nestane se nic, protoze v (T0) uz
+    Ook? Ook!                   //je pripravena mezera; pokud (T2), do (T1) se
+                                //presune znak z (T5).
+    //>
+    Ook. Ook?
+
+    Ook! Ook?                   //pokud se toto spusti, (T2) = (display_wave) je
+      //<<<                     //nula a je tedy mensi rovno cemukoli. proto se
+      Ook? Ook. Ook? Ook.       //do (T0) presune (char_h) z (T5).
+      Ook? Ook.
+      //[-]
+      Ook! Ook?
+        Ook! Ook!
+      Ook? Ook!                 //vynulovani (T0)
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+
+      Ook! Ook?                 //presunuti (char_h) z (T5) do (T0)
+        //-
+        Ook! Ook!
+        //<<<<< +
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+        Ook. Ook.
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //<<<<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      //[-]
+      Ook! Ook?
+        Ook! Ook!
+      Ook? Ook!                 //vynulovani (T1)
+      //>> -
+      Ook. Ook? Ook. Ook?
+      Ook! Ook!                 //vynulovani zachytneho bodu v (T3)
+      //>
+      Ook. Ook?                 //presun na (T4)
+    Ook? Ook!
+
+    //< +
+    Ook? Ook.
+    Ook. Ook.                   //obnova zachytneho bodu v (T3)
+    //<<
+    Ook? Ook. Ook? Ook.         //presun na (T1)
+
+    Ook! Ook?
+      //> -
+      Ook. Ook?
+      Ook! Ook!
+
+      Ook! Ook?
+        //> -
+        Ook. Ook?
+        Ook! Ook!
+      Ook? Ook!
+
+      //>
+      Ook. Ook?
+
+      Ook! Ook?                 //pokud se toto spusti, (T2) = (display_wave)
+        //<<<                   //kleslo na nulu driv a je tedy mensi. proto se
+        Ook? Ook. Ook? Ook.     //do (T0) presune (char_h) z (T5).
+        Ook? Ook.
+        //[-]
+        Ook! Ook?
+          Ook! Ook!
+        Ook? Ook!               //vynulovani (T0)
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+
+        Ook! Ook?               //presunuti (char_h) z (T5) do (T0)
+          //-
+          Ook! Ook!
+          //<<<<< +
+          Ook? Ook. Ook? Ook.
+          Ook? Ook. Ook? Ook.
+          Ook? Ook.
+          Ook. Ook.
+          //>>>>>
+          Ook. Ook? Ook. Ook?
+          Ook. Ook? Ook. Ook?
+          Ook. Ook?
+        Ook? Ook!
+
+        //<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        //[-] +
+        Ook! Ook?
+          Ook! Ook!
+        Ook? Ook!
+        Ook. Ook.               //zapsi jednicky do (T1)
+        //>> -
+        Ook. Ook? Ook. Ook?
+        Ook! Ook!               //vynulovani zachytneho bodu v (T3)
+        //>
+        Ook. Ook?               //presun na (T4)
+      Ook? Ook!
+
+      //< +
+      Ook? Ook.
+      Ook. Ook.                 //obnova zachytneho bodu v (T3)
+      //<< -
+      Ook? Ook. Ook? Ook.
+      Ook! Ook!                 //presun na (T1) a odecteni jednicky
+    Ook? Ook!
+
+    //>
+    Ook. Ook?
+    //[-]
+    Ook! Ook?                   //vynulovani (T2)
+      Ook! Ook!
+    Ook? Ook!
+    //> -
+    Ook. Ook?
+    Ook! Ook!                   //a (T3)
+    //>>
+    Ook. Ook? Ook. Ook?
+    //[-]
+    Ook! Ook?
+      Ook! Ook!
+    Ook? Ook!                   //a (T5)
+    //<<<<< .
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook! Ook.                   //vypis znaku v (T0)
+    //[-]
+    Ook! Ook?
+      Ook! Ook!
+    Ook? Ook!                   //vynulovani (T0)
+
+    //<<<<< <<<< -
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook! Ook!
+
+    Ook! Ook?
+      //+ <<< -
+      Ook. Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+      Ook! Ook!
+    Ook? Ook!
+
+    //+
+    Ook. Ook.
+    //>>> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!                   //presun na dalsi (i_h) a odecteni jednicky
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnova (CH2_h)
+  //<<<
+  Ook? Ook. Ook? Ook. Ook? Ook.
+
+  Ook! Ook?                     //presun na (CH1_h) s nulovanim indexovych bunek
+    //- <<<
+    Ook! Ook!
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //zapis jednicky do (CH1_h)
+  //>>> -
+  Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook! Ook!
+
+  Ook! Ook?                     //presun na (CH2_h)
+    //+ >>> -
+    Ook. Ook.
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnova (CH2_h)
+
+  /* vypis neuspesne tipovanych pismen */
+
+  //> .
+  Ook. Ook?
+  Ook! Ook.                     //odradkovani
+  //>>>>> >>>>> >> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //uprava (CH1_m) na nulu
+  //>>>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na prvni (i_m) a odecteni jednicky
+
+  Ook! Ook?
+    //+
+    Ook. Ook.
+    //> .
+    Ook. Ook?
+    Ook! Ook.                   //vypis (char_m)
+    //<<<<< <
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+
+    Ook! Ook?                   //presun na (CH1_m)
+      //<<<<<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+    Ook? Ook!
+
+    //<<<<< <<<<< < .
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook! Ook.                   //vypis mezery
+    //>>>>> >>>>> >>>>> >
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+
+    Ook! Ook?                   //presun na aktualni (i_m)
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //+
+    Ook. Ook.                   //oznaceni aktualniho (i_m) za uz neuktalni
+    //>>>>> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!                   //presun na dalsi (i_m) a odecteni jednicky
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnova (CH2_m)
+  //<<<<<
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+
+  Ook! Ook?                     //presun na (CH1_m) s nulovanim indexovych bunek
+    //- <<<<<
+    Ook! Ook!
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnova (CH1_m) na jednicku
+
+  //<<<<< <<<<< << ..
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook! Ook. Ook! Ook.           //2x odradkovani
+
+  /* vypis hadaneho slova */
+
+  //>>>>> >>>>> >>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na prvni (i_w) a odecteni jednicky
+
+  Ook! Ook?
+    //+
+    Ook. Ook.
+    //>
+    Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!                 //presunuti (char_w)
+      //<<<<< <
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<<< +
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+      Ook. Ook.                 //do (T1)
+      //> +
+      Ook. Ook?
+      Ook. Ook.                 //a do (T2) pro obnovu
+      //>>>>> >>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+
+      Ook! Ook?
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //>
+      Ook. Ook?
+    Ook? Ook!
+
+    //<<<<< <
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+
+    Ook! Ook?
+      //<<<<<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+    Ook? Ook!
+
+    //<<
+    Ook? Ook. Ook? Ook.
+
+    Ook! Ook?                   //obnova (char_w) z (T2)
+      //-
+      Ook! Ook!
+      //>>>>> >>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+
+      Ook! Ook?
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //> +
+      Ook. Ook?
+      Ook. Ook.
+      //<<<<< <
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<<
+      Ook? Ook. Ook? Ook.
+    Ook? Ook!
+
+    //>>>>> >>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+
+    Ook! Ook?
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //>>
+    Ook. Ook? Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!                 //presunuti (guessed)
+      //<<<<< <<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<< +
+      Ook? Ook. Ook? Ook.
+      Ook. Ook.                 //do (T2)
+      //> +
+      Ook. Ook?
+      Ook. Ook.                 //a do (T3) pro obnovu
+      //>>>>> >
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+
+      Ook! Ook?
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //>>
+      Ook. Ook? Ook. Ook?
+    Ook? Ook!
+
+    //<<<<< <<
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+
+    Ook! Ook?
+      //<<<<<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+    Ook? Ook!
+
+    //<
+    Ook? Ook.
+
+    Ook! Ook?                   //obnova (guessed) z (T3)
+      //-
+      Ook! Ook!
+      //>>>>> >
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+
+      Ook! Ook?
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //>> +
+      Ook. Ook? Ook. Ook?
+      Ook. Ook.
+      //<<<<< <<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<
+      Ook? Ook.
+    Ook? Ook!
+
+    //<
+    Ook? Ook.
+
+    Ook! Ook?                   //toto se spusti pro (guessed) = 1
+      //< .
+      Ook? Ook.
+      Ook! Ook.                 //vypis uhodnuteho znaku
+      //[-]
+      Ook! Ook?
+        Ook! Ook!
+      Ook? Ook!                 //vynulovani (T1)
+    Ook? Ook!
+
+    //<
+    Ook? Ook.
+    //[<]
+    Ook! Ook?
+      Ook? Ook.
+    Ook? Ook!                   //sjednoceni pointeru na (T0)
+    //>> -
+    Ook. Ook? Ook. Ook?
+    Ook! Ook!                   //"obraceni role" (guessed)
+
+    Ook! Ook?                   //tento cyklus se tedy spusti pro (guessed) = 0
+      //<<<< .
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook! Ook.                 //vypis podtrzitka
+      //>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+      //[-]
+      Ook! Ook?
+        Ook! Ook!
+      Ook? Ook!                 //vynulovani (T1)
+      //> +
+      Ook. Ook?
+      Ook. Ook.                 //a (T2)
+    Ook? Ook!
+
+    //<<<<< < .
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook! Ook.                   //vypis mezery
+    //>>>>> >>>>> >>>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+
+    Ook! Ook?                   //presun na aktualni (i_w)
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //+
+    Ook. Ook.                   //oznaceni aktualniho (i_w) za uz neaktualni
+    //>>>>> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!                   //presun na dalsi (i_w) a odecteni jednicky
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnova (CH2_w)
+  //<<<<<
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+
+  Ook! Ook?                     //presun na (CH1_w) s nulovanim indexovych bunek
+    //- <<<<<
+    Ook! Ook!
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+  Ook? Ook!
+
+  //<<<<< <<<< ..
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook! Ook. Ook! Ook.           //2x odradkovani
+
+  /* kontrola vyhry */
+
+  //>>>>> >>>>> >>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na prvni (i_w) a odecteni jednicky
+
+  Ook! Ook?
+    //+
+    Ook. Ook.
+    //<<<<<
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+
+    Ook! Ook?
+      //<<<<<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+    Ook? Ook!
+
+    //<<< +
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook. Ook.                   //zapsani jednicky do (T1)
+    //>>>>> >>>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+
+    Ook! Ook?
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //>>
+    Ook. Ook? Ook. Ook?
+
+    Ook! Ook?
+      //-
+      Ook! Ook!                 //presunuti (guessed)
+      //<<<<< <<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<< +
+      Ook? Ook. Ook? Ook.
+      Ook. Ook.                 //do (T2) pro obnovu
+      //< -
+      Ook? Ook.
+      Ook! Ook!                 //a odecteni od (T1)
+      //>>>>> >>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+
+      Ook! Ook?
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //>>
+      Ook. Ook? Ook. Ook?
+    Ook? Ook!
+
+    //<<<<< <<
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+
+    Ook! Ook?
+      //<<<<<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+    Ook? Ook!
+
+    //<<
+    Ook? Ook. Ook? Ook.
+
+    Ook! Ook?                   //obnova (guessed) z (T2)
+      //-
+      Ook! Ook!
+      //>>>>> >>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+
+      Ook! Ook?
+        //>>>>>
+        Ook. Ook? Ook. Ook?
+        Ook. Ook? Ook. Ook?
+        Ook. Ook?
+      Ook? Ook!
+
+      //>> +
+      Ook. Ook? Ook. Ook?
+      Ook. Ook.
+      //<<<<< <<
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook. Ook? Ook.
+      Ook? Ook.
+
+      Ook! Ook?
+        //<<<<<
+        Ook? Ook. Ook? Ook.
+        Ook? Ook. Ook? Ook.
+        Ook? Ook.
+      Ook? Ook!
+
+      //<<
+      Ook? Ook. Ook? Ook.
+    Ook? Ook!
+
+    //>>>>> >>
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+
+    Ook! Ook?
+      //>>>>>
+      Ook. Ook? Ook. Ook?
+      Ook. Ook? Ook. Ook?
+      Ook. Ook?
+    Ook? Ook!
+
+    //+
+    Ook. Ook.                   //oznaceni aktualniho (i_w) za uz neaktualni
+    //>>>>> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook. Ook?
+    Ook! Ook!                   //presun na dalsi (i_w) a odecteni jednicky
+  Ook? Ook!
+
+  //+
+  Ook. Ook.                     //obnova (CH2_w)
+  //<<<<<
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+
+  Ook! Ook?                     //presun na (CH1_w) s nulovanim indexovych bunek
+    //- <<<<<
+    Ook! Ook!
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+  Ook? Ook!
+
+  //<< +
+  Ook? Ook. Ook? Ook.
+  Ook. Ook.                     //(T2) bude fungovat jako "opak" (T1)
+  //<                           //pokud je v (T1) nyni nula, vsechna pismena uz
+  Ook? Ook.                     //jsou uhadnuta
+
+  Ook! Ook?                     //pokud se toto spusti, v (T1) nebyla nula, do
+    //> -                       //(T2) tedy naopak patri nula
+    Ook. Ook?
+    Ook! Ook!
+    //<
+    Ook? Ook.
+    //[-]
+    Ook! Ook?
+      Ook! Ook!
+    Ook? Ook!                   //vynulovani (T1)
+  Ook? Ook!
+
+  //>
+  Ook. Ook?
+
+  Ook! Ook?                     //toto se spusti, pokud (T2) != 0, tedy (T1) = 0
+    //<<<                       //a tedy cele slovo uz je uhadnuto
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    //[-]
+    Ook! Ook?
+      Ook! Ook!
+    Ook? Ook!                   //vynulovani (lives) pro ukonceni hry
+    //> +
+    Ook. Ook?
+    Ook. Ook.                   //zapsani jednicky do (T0) - priznak vitezstvi
+    //>> -
+    Ook. Ook? Ook. Ook?
+    Ook! Ook!                   //vynulovani (T2)
+  Ook? Ook!
+
+  //<<<
+  Ook? Ook. Ook? Ook. Ook? Ook. //presun na (lives)
+Ook? Ook!
+
+/* vykresleni hodnoticiho smajlika, popr. neuhadnuteho slova */
+
+//<<<< .
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook.
+Ook! Ook.                       //odradkovani
+//>>>>> -
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook?
+Ook! Ook!                       //"obraceni role" (T0)
+
+Ook! Ook?                       //tento cyklus se spusti, pokud hrac prohral a
+  //>>>> +                      //vypise hadane slovo (odkryte)
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?
+  Ook. Ook.                     //uprava (CH1_w) na jednicku
+  //>>>>> -
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //presun na prvni (i_w) a odecteni jednicky
+
+  Ook! Ook?
+    //+
+    Ook. Ook.
+    //> .
+    Ook. Ook?
+    Ook! Ook.                   //vypis znaku
+    //>>>> -
+    Ook. Ook? Ook. Ook?
+    Ook. Ook? Ook. Ook?
+    Ook! Ook!                   //presun na dalsi (i_w) a odecteni jednicky
+  Ook? Ook!                     //Pozn.: (CH2_w) se neobnovuje, neni uz proc
+
+  //-
+  Ook! Ook!
+
+  Ook! Ook?                     //presun na (CH1_w), necha minus jednicky v
+    //<<<<< -                   //indexovych bunkach, ale to uz je jedno
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+    Ook? Ook.
+    Ook! Ook!
+  Ook? Ook!
+
+  //<<<<< <<<< ..
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook! Ook. Ook! Ook.           //2x odradkovani
+  //>>>>
+  Ook. Ook? Ook. Ook? Ook. Ook?
+  Ook. Ook?                     //presun na (lives) pro ukonceni cyklu
+Ook? Ook!
+
+//<<
+Ook? Ook. Ook? Ook.
+//[>]
+Ook! Ook? Ook. Ook? Ook? Ook!   //sjednoceni pointeru na (lives)
+//> +
+Ook. Ook?
+Ook. Ook.                       //obnoveni priznaku vitezstvi v (T0)
+//< +++++
+Ook? Ook.
+Ook. Ook. Ook. Ook. Ook. Ook.
+Ook. Ook. Ook. Ook.
+
+Ook! Ook?                       //priprava smajlika pro pripad prohry
+  //-
+  Ook! Ook!
+  //>> +++++ +++
+  Ook. Ook? Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //40 do (T1)
+  //> +++++ ++++
+  Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //45 do (T2)
+  //> +++++ +++++ +++++ ++++
+  Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook.                     //95 do (T3)
+  //> +++++ ++++
+  Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook. //45 do (T4)
+  //> +++++ +++
+  Ook. Ook?
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook.           //40 do (T5)
+  //<<<<< <
+  Ook? Ook. Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook!
+
+//>>>>> > +
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook? Ook. Ook? Ook. Ook?
+Ook. Ook.                       //41 do (T5)
+//<<<<<
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook.
+
+Ook! Ook?                       //pokud se tento cyklus spustil, hrac vyhral,
+  //+++++ ++++                  //smajlik se tedy prepise na vyherni verzi
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+  Ook. Ook. Ook. Ook. Ook. Ook.
+
+  Ook! Ook?
+    //-
+    Ook! Ook!
+    //>> +++++
+    Ook. Ook? Ook. Ook?
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+    Ook. Ook.                   //pricteni 50 k 45 v (T2)
+    //>> +++++
+    Ook. Ook? Ook. Ook?
+    Ook. Ook. Ook. Ook.
+    Ook. Ook. Ook. Ook.
+    Ook. Ook.                   //totez s (T4)
+    //<<<<
+    Ook? Ook. Ook? Ook.
+    Ook? Ook. Ook? Ook.
+  Ook? Ook!
+
+  //>> -
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //94 do (T2)
+  //>> -
+  Ook. Ook? Ook. Ook?
+  Ook! Ook!                     //94 do (T4)
+  //<<<<
+  Ook? Ook. Ook? Ook.
+  Ook? Ook. Ook? Ook.
+Ook? Ook!
+                                //vypis smajlika
+//> .
+Ook. Ook?
+Ook! Ook.
+//> .
+Ook. Ook?
+Ook! Ook.
+//> .
+Ook. Ook?
+Ook! Ook.
+//> .
+Ook. Ook?
+Ook! Ook.
+//> .
+Ook. Ook?
+Ook! Ook.
+//<<<<< <<<<< .
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook. Ook? Ook. Ook? Ook.
+Ook? Ook.
+Ook! Ook.                       //odradkovani
+
+
+                                 MEMORY CELLS
+
+[0   -]    0    1 2  3      4          5               162
+[- 162] (CH1_h)()()(i_h)(char_h)(display_wave) [...] (CH2_h)
+
+[163 -]   163    164   165   166       167       168    169 170 171
+[- 171] (10/\n)(30/ )(70/>)(100/_)(110/lives)(guess/T0)(T1)(T2)(T3)
+
+[172 -]     172    173 174  175   176  177    178     179    180   181
+[-   ?] (CH1_w/T4)(T5)(T6)(CH1_m)(hit)(i_w)(char_w)(guessed)(i_m)(char_m) [...]
+
+[?   -]
+[- inf] (CH2_m) [...] (CH2_w)
+
+/* TODO */
+(T6) je zbytecna?
+#159-#161 jsou zbytecne, po vykresleni obesence se stejne vzdycky odradkovava.
+Sjednocovaci manevr okolo radku 1320 je humus...
+Pohyb v poli by sel naopak, pres nuly misto pres jednicky... bylo by to lepsi?
+Zaverecny smajlik ma obe oci stejne, stacila by jedna bunka.
